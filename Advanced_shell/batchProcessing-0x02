@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# List of Pokémon (case-insensitive)
+pokemon_list=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
+
+# Base URL of the PokéAPI
+BASE_URL="https://pokeapi.co/api/v2/pokemon"
+
+# Delay between requests (in seconds) to avoid rate-limiting
+DELAY=2
+
+# Max number of attempts per Pokémon
+MAX_RETRIES=3
+
+# Error log file
+ERROR_FILE="errors.txt"
+
+# Loop through each Pokémon
+for name in "${pokemon_list[@]}"; do
+    FILENAME="${name}.json"
+    URL="${BASE_URL}/${name}"
+
+    success=false
+    attempt=1
+
+    while [ "$attempt" -le "$MAX_RETRIES" ]; do
+        # Make the API request
+        response=$(curl -s -w "%{http_code}" -o "$FILENAME" "$URL")
+        status_code="${response: -3}"
+
+        if [ "$status_code" -eq 200 ]; then
+            echo "Success: Saved $name data to $FILENAME"
+            success=true
+            break
+        else
+            echo "Failed with status $status_code. Retrying in $DELAY..."
+            sleep "$DELAY"
+            ((attempt++))
+        fi
+    done
+    
+    # If all attempts failed
+    if [ "$success" = false ]; then
+        echo "ERROR: Failed to fetch $name after $MAX_RETRIES attempts." | tee -a "$ERROR_FILE"
+        echo "Status: $status_code | Timestamp: $(date)" >> "$ERROR_FILE"
+    fi
+
+
+    sleep "$DELAY"
+done
