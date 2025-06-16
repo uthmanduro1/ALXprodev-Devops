@@ -9,7 +9,7 @@ echo "Name,height (m),Weight (kg)" > "$REPORT_FILE"
 # Loop through all JSON files
 for file in *.json; do
   if [ -f "$file" ]; then
-    name=$(jq -r '.name' "$file")
+    name=$(jq -r '.name' "$file" | sed 's/^\(.\)/\U\1/')
     height=$(jq '.height' "$file")   # height in decimetres
     weight=$(jq '.weight' "$file")   # weight in hectograms
 

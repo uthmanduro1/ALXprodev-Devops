@@ -8,9 +8,9 @@ fi
 
 # Extract values using jq
 name=$(jq -r '.name' data.json | sed 's/.*/\u&/')   # Capitalize first letter
-height=$(jq '.height' data.json | awk '{ printf "%.1f", $1 / 10 }')  # Convert dm to meters
-weight=$(jq '.weight' data.json | awk '{ printf "%.0f", $1 / 10 }')  # Convert hg to kg
+formatted_height=$(jq '.height' data.json | awk '{ printf "%.1f", $1 / 10 }')  # Convert dm to meters
+formatted_weight=$(jq '.weight' data.json | awk '{ printf "%.0f", $1 / 10 }')  # Convert hg to kg
 type=$(jq -r '.types[0].type.name' data.json | sed 's/.*/\u&/')  # Capitalize
 
 # Print the formatted result
-echo "$name is of type $type, weighs ${weight}kg, and is ${height}m tall."
+echo "$name is of type $type, weighs ${formatted_weight}kg, and is ${formatted_height}m tall."
